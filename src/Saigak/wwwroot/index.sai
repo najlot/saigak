@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Todo</title>
+	<link rel="icon" sizes="96x96" href="icon.ico" />
+  </head>
+  <body>
+	<div style="min-height: 100px" ></div>
+	<h1 class="text-center">Login</h1>
+	<table class="table">
+	<tbody>
+		<tr class="d-flex">
+			<td class="col-sm-6 text-right">Username:</td>
+			<td class="col-sm-6">
+				<input type="text" />
+			</td>
+		</tr>
+		<tr class="d-flex">
+			<td class="col-sm-6 text-right">Password:</td>
+			<td class="col-sm-6">
+				<input type="password" />
+			</td>
+		</tr>
+		<tr class="d-flex">
+			<td class="col-sm-6 text-right">
+				<form action="/register.sai" method="get">
+					<button type="submit" style="min-width: 30%" class="btn btn-primary btn-lg">Register</button>
+				</form>
+			</td>
+			<td class="col-sm-6">
+				<form action="/todoitems.sai" method="get">
+					<button type="submit" style="min-width: 30%" class="btn btn-primary btn-lg">Login</button>
+				</form>
+			</td>
+		</tr>
+	</tbody>
+	</table>
+	
+    <script src="jquery-3.4.1.slim.min.js" />
+    <script src="popper.min.js" />
+    <script src="bootstrap.min.js" />
+  </body>
+</html>
