@@ -2,16 +2,24 @@
 <html lang="en">
   <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <title>Todo</title>
 	<link rel="icon" sizes="96x96" href="icon.ico" />
   </head>
   <body>
 	<div style="min-height: 10px" ></div>
-	<h1 class="text-center">TodoItems</h1>
+	<h1 class="text-center">Todos</h1>
 	<table class="table">
+		<thead class="thead-light">
+			<tr>
+				<th scope="col">Title</th>
+				<th scope="col">Created date</th>
+				<th scope="col">Priority</th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
 	<tbody>
 		<?cs
 		Directory.CreateDirectory("data");
@@ -57,43 +65,57 @@
 		
 		foreach (var item in items)
 		{
-			await WriteLineAsync("<tr class=\"d-flex\">");
-			
-			await WriteLineAsync("<td class=\"col-sm-3\">");
+			await WriteLineAsync("<tr>");
+			await WriteLineAsync("<td>");
 			await WriteLineAsync(item.Title);
 			await WriteLineAsync("</td>");
 			
-			await WriteLineAsync("<td class=\"col-sm-3\">");
+			await WriteLineAsync("<td>");
 			await WriteLineAsync(item.CreatedAt.ToString());
 			await WriteLineAsync("</td>");
 			
-			await WriteLineAsync("<td class=\"col-sm-2\">");
+			await WriteLineAsync("<td>");
 			await WriteLineAsync(item.Priority);
 			await WriteLineAsync("</td>");
 			
-			await WriteLineAsync("<td class=\"col-sm-2\">");
+			await WriteLineAsync("<td>");
 			await WriteLineAsync("<button class=\"btn btn-danger\" type=\"button\" onclick=\"deleteTodoItem('"+item.Id+"')\">Delete</button>");
 			await WriteLineAsync("</td>");
 			
 			await WriteLineAsync("</tr>");
 		}
 		?>
+		<form id="newItemForm">
+		<tr>
+		<td>
+			<input name="title" id="newItemFormTitle" type="text" placeholder="Enter Title" class="form-control"/>
+		</td>
+			<td>
+			</td>
+			<td>
+				<input name="priority" id="newItemFormPriority" placeholder="Enter Priority" type="text" class="form-control"/>
+			</td>
+			<td>
+				<button class="btn btn-primary" type="button" onclick="addTodoItem()">Create</button>
+			</td>
+		</tr>
+	</form>
 	</tbody>
 	</table>
-	
-	<input id="addTodoItemTitle" type="text"/>
-	<button type="button" onclick="addTodoItem()" class="btn btn-primary">Create new</button>
-	
     <script src="jquery-3.5.1.min.js" ></script>
     <script src="popper.min.js" ></script>
     <script src="bootstrap.min.js" ></script>
 	
 	<script type="text/javascript" language="javascript">
 		function addTodoItem(){
+			var data = $("#newItemForm").serialize();
+			$("#newItemFormTitle").val("");
+			$("#newItemFormPriority").val("");
+			
 			$.ajax({
 				type:'POST',
 				url: "addTodoItem.cs",
-				data:"title=" + $("#addTodoItemTitle").val(),
+				data: data,
 				success:function(){
 				   location.reload();
 			   }

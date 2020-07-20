@@ -1,8 +1,8 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Saigak.RequestHandler;
+using System.Threading.Tasks;
 
 namespace Saigak
 {
@@ -24,6 +24,10 @@ namespace Saigak
 			var handler = new StaticRequestHandler(env.ContentRootPath)
 				.SetNext(new SaiRequestHandler(env.ContentRootPath))
 				.SetNext(new CsRequestHandler(env.ContentRootPath))
+				.SetNext(new PhpRequestHandler(env.ContentRootPath))
+				.SetNext(new PyRequestHandler(env.ContentRootPath))
+				.SetNext(new JsRequestHandler(env.ContentRootPath))
+				.SetNext(new LuaRequestHandler(env.ContentRootPath))
 				.SetNext(new NotFoundRequestHandler(env.ContentRootPath));
 
 			app.Run(async context =>

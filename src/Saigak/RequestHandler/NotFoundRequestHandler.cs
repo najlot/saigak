@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
 {
-	public class NotFoundRequestHandler : AbstractRequestHandler
+	public sealed class NotFoundRequestHandler : AbstractRequestHandler
 	{
 		public NotFoundRequestHandler(string contentRootPath) : base(contentRootPath)
 		{

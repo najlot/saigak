@@ -2,15 +2,29 @@
 <html lang="en">
   <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <title>Todo</title>
 	<link rel="icon" sizes="96x96" href="icon.ico" />
   </head>
   <body>
-	
-    <script src="jquery-3.4.1.slim.min.js" />
+<?py
+writeline("Hello from IronPython!");
+?>
+<?lua
+writeline("Hello from Moonsharp!");
+?>
+<?php
+echo "Hello from PeachPie!";
+?>
+<?cs
+WriteLine("Hello from C#!");
+?>
+<?js
+writeline("Hello from Jurassic!");
+?>
+    <script src="jquery-3.5.1.min.js" />
     <script src="popper.min.js" />
     <script src="bootstrap.min.js" />
   </body>

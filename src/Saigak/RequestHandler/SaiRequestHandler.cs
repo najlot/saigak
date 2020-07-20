@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Peachpie.AspNetCore.Web;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace Saigak.RequestHandler
 {
-	public class SaiRequestHandler : AbstractRequestHandler
+	public sealed class SaiRequestHandler : AbstractRequestHandler
 	{
 		public SaiRequestHandler(string contentRootPath) : base(contentRootPath)
 		{
@@ -118,12 +118,13 @@ namespace Saigak.RequestHandler
 
 			if (fullPath != null && File.Exists(fullPath))
 			{
-				context.Response.StatusCode = 200;
 				context.Response.ContentType = "text/html; charset=utf-8";
-				
+
 				var content = await File.ReadAllTextAsync(fullPath);
 				var globals = new Globals(context);
 				var sections = GetSections(content);
+
+				var ctx = context.GetOrCreateContext();
 
 				foreach (var (Language, Content) in sections)
 				{
@@ -131,7 +132,23 @@ namespace Saigak.RequestHandler
 					{
 						await CsProcessor.Instance.Run(Content, globals);
 					}
-					else
+					else if (Language.Equals("py", StringComparison.OrdinalIgnoreCase))
+					{
+						PyProcessor.Instance.Run(Content, globals);
+					}
+					else if (Language.Equals("php", StringComparison.OrdinalIgnoreCase))
+					{
+						PhpProcessor.Instance.Run(Content, ctx, fullPath);
+					}
+					else if (Language.Equals("js", StringComparison.OrdinalIgnoreCase))
+					{
+						JsProcessor.Instance.Run(Content, globals);
+					}
+					else if (Language.Equals("lua", StringComparison.OrdinalIgnoreCase))
+					{
+						LuaProcessor.Instance.Run(Content, globals);
+					}
+					else if (Content.Length > 0)
 					{
 						await globals.WriteAsync(Content);
 					}

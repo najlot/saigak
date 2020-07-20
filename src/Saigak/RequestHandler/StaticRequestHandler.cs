@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace Saigak.RequestHandler
 {
-	public class StaticRequestHandler : AbstractRequestHandler
+	public sealed class StaticRequestHandler : AbstractRequestHandler
 	{
 		public StaticRequestHandler(string contentRootPath) : base(contentRootPath)
 		{

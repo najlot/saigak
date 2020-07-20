@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Peachpie.AspNetCore.Web;
 using System;
 using System.IO;
 using System.Linq;
@@ -6,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
 {
-	public sealed class CsRequestHandler : AbstractRequestHandler
+	public sealed class PhpRequestHandler : AbstractRequestHandler
 	{
-		public CsRequestHandler(string contentRootPath) : base(contentRootPath)
+		public PhpRequestHandler(string contentRootPath) : base(contentRootPath)
 		{
 			Directory.CreateDirectory(Path.Combine(contentRootPath, "wwwroot"));
 		}
@@ -20,7 +21,7 @@ namespace Saigak.RequestHandler
 
 			if (!context.Request.Path.HasValue)
 			{
-				path = Path.Combine(ContentRootPath, "wwwroot", "index.cs");
+				path = Path.Combine(ContentRootPath, "wwwroot", "index.php");
 			}
 			else
 			{
@@ -28,11 +29,11 @@ namespace Saigak.RequestHandler
 
 				if (string.IsNullOrWhiteSpace(requestPath))
 				{
-					path = Path.Combine(ContentRootPath, "wwwroot", "index.cs");
+					path = Path.Combine(ContentRootPath, "wwwroot", "index.php");
 				}
 				else
 				{
-					if (Path.GetExtension(requestPath)?.ToLower() != ".cs")
+					if (Path.GetExtension(requestPath)?.ToLower() != ".php")
 					{
 						return false;
 					}
@@ -55,12 +56,9 @@ namespace Saigak.RequestHandler
 
 			if (fullPath != null && File.Exists(fullPath))
 			{
-				context.Response.StatusCode = 200;
-				context.Response.ContentType = "text/html; charset=utf-8";
-
+				var ctx = context.GetOrCreateContext();
 				var content = await File.ReadAllTextAsync(fullPath);
-
-				await CsProcessor.Instance.Run(content, new Globals(context));
+				PhpProcessor.Instance.Run(content, ctx, fullPath, false);
 
 				return true;
 			}

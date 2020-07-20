@@ -1,4 +1,3 @@
-
 public class TodoItem
 {
 	public Guid Id { get; set; }
@@ -16,7 +15,7 @@ items.Add(new TodoItem()
 	Id = Guid.NewGuid(),
 	Title = Context.Request.Form["title"].ToString(),
 	CreatedAt = DateTime.Now,
-	Priority = ""
+	Priority = Context.Request.Form["priority"].ToString()
 });
 
 content = JsonConvert.SerializeObject(items);

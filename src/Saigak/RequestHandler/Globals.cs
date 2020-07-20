@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Buffers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +25,21 @@ namespace Saigak.RequestHandler
 		{
 			await Context.Response.WriteAsync(s, _encoding);
 			await Context.Response.WriteAsync("\n", _encoding);
+		}
+
+		public void Write(string s)
+		{
+			var bytes = _encoding.GetBytes(s);
+			Context.Response.BodyWriter.Write(bytes);
+		}
+
+		private readonly byte[] _newLineBytes = new byte[] { (byte)'\n' };
+
+		public void WriteLine(string s)
+		{
+			var bytes = _encoding.GetBytes(s);
+			Context.Response.BodyWriter.Write(bytes);
+			Context.Response.BodyWriter.Write(_newLineBytes);
 		}
 	}
 }

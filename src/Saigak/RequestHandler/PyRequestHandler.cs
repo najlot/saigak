@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
 {
-	public sealed class CsRequestHandler : AbstractRequestHandler
+	public sealed class PyRequestHandler : AbstractRequestHandler
 	{
-		public CsRequestHandler(string contentRootPath) : base(contentRootPath)
+		public PyRequestHandler(string contentRootPath) : base(contentRootPath)
 		{
 			Directory.CreateDirectory(Path.Combine(contentRootPath, "wwwroot"));
 		}
@@ -20,7 +20,7 @@ namespace Saigak.RequestHandler
 
 			if (!context.Request.Path.HasValue)
 			{
-				path = Path.Combine(ContentRootPath, "wwwroot", "index.cs");
+				path = Path.Combine(ContentRootPath, "wwwroot", "index.py");
 			}
 			else
 			{
@@ -28,11 +28,11 @@ namespace Saigak.RequestHandler
 
 				if (string.IsNullOrWhiteSpace(requestPath))
 				{
-					path = Path.Combine(ContentRootPath, "wwwroot", "index.cs");
+					path = Path.Combine(ContentRootPath, "wwwroot", "index.py");
 				}
 				else
 				{
-					if (Path.GetExtension(requestPath)?.ToLower() != ".cs")
+					if (Path.GetExtension(requestPath)?.ToLower() != ".py")
 					{
 						return false;
 					}
@@ -55,12 +55,8 @@ namespace Saigak.RequestHandler
 
 			if (fullPath != null && File.Exists(fullPath))
 			{
-				context.Response.StatusCode = 200;
-				context.Response.ContentType = "text/html; charset=utf-8";
-
 				var content = await File.ReadAllTextAsync(fullPath);
-
-				await CsProcessor.Instance.Run(content, new Globals(context));
+				PyProcessor.Instance.Run(content, new Globals(context));
 
 				return true;
 			}
