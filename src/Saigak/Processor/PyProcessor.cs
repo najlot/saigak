@@ -1,15 +1,16 @@
 ﻿using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
 using System;
 using System.Collections.Concurrent;
 
-namespace Saigak.RequestHandler
+namespace Saigak.Processor
 {
 	public sealed class PyProcessor
 	{
 		public static PyProcessor Instance { get; } = new PyProcessor();
 
-		private readonly Microsoft.Scripting.Hosting.ScriptEngine _engine = Python.CreateEngine();
-		private readonly ConcurrentDictionary<string, Microsoft.Scripting.Hosting.ScriptSource> cache = new ConcurrentDictionary<string, Microsoft.Scripting.Hosting.ScriptSource>();
+		private readonly ScriptEngine _engine = Python.CreateEngine();
+		private readonly ConcurrentDictionary<string, ScriptSource> _cache = new ConcurrentDictionary<string, ScriptSource>();
 
 		public void Run(string content, Globals globals)
 		{
@@ -27,10 +28,10 @@ namespace Saigak.RequestHandler
 				globals.WriteLine(str);
 			}));
 
-			if (!cache.TryGetValue(content, out var source))
+			if (!_cache.TryGetValue(content, out var source))
 			{
 				source = _engine.CreateScriptSourceFromString(content);
-				cache[content] = source;
+				_cache[content] = source;
 			}
 
 			source.Execute(scope);

@@ -2,13 +2,13 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace Saigak.RequestHandler
+namespace Saigak.Processor
 {
 	public sealed class JsProcessor
 	{
 		public static JsProcessor Instance { get; } = new JsProcessor();
 
-		private readonly ConcurrentDictionary<string, CompiledScript> cache = new ConcurrentDictionary<string, CompiledScript>();
+		private readonly ConcurrentDictionary<string, CompiledScript> _cache = new ConcurrentDictionary<string, CompiledScript>();
 
 		public void Run(string content, Globals globals, string path = null)
 		{
@@ -29,10 +29,10 @@ namespace Saigak.RequestHandler
 				globals.Write(str);
 			}));
 
-			if (!cache.TryGetValue(content, out var script))
+			if (!_cache.TryGetValue(content, out var script))
 			{
 				script = engine.Compile(new StringScriptSource(content, path));
-				cache[content] = script;
+				_cache[content] = script;
 			}
 
 			script.Execute(engine);

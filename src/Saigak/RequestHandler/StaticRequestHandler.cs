@@ -69,15 +69,15 @@ namespace Saigak.RequestHandler
 						break;
 
 					case ".jpg":
-						context.Response.ContentType = "text/jpeg";
+						context.Response.ContentType = "image/jpeg";
 						break;
 
 					case ".png":
-						context.Response.ContentType = "text/png";
+						context.Response.ContentType = "image/png";
 						break;
 
 					case ".ico":
-						context.Response.ContentType = "text/x-icon";
+						context.Response.ContentType = "image/x-icon";
 						break;
 				}
 

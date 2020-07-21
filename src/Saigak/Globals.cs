@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saigak.RequestHandler
+namespace Saigak
 {
 	public class Globals
 	{
@@ -33,7 +33,7 @@ namespace Saigak.RequestHandler
 			Context.Response.BodyWriter.Write(bytes);
 		}
 
-		private readonly byte[] _newLineBytes = new byte[] { (byte)'\n' };
+		private static readonly byte[] _newLineBytes = new byte[] { (byte)'\n' };
 
 		public void WriteLine(string s)
 		{

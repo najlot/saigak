@@ -1,7 +1,7 @@
 ﻿using MoonSharp.Interpreter;
 using System;
 
-namespace Saigak.RequestHandler
+namespace Saigak.Processor
 {
 	public sealed class LuaProcessor
 	{

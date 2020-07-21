@@ -1,71 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
+using Saigak.Processor;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
 {
-	public sealed class CsRequestHandler : AbstractRequestHandler
+	public sealed class CsRequestHandler : AbstractScriptRequestHandler
 	{
-		public CsRequestHandler(string contentRootPath) : base(contentRootPath)
+		public CsRequestHandler(string contentRootPath) : base(contentRootPath, ".cs")
 		{
-			Directory.CreateDirectory(Path.Combine(contentRootPath, "wwwroot"));
 		}
 
-		public override async Task<bool> TryHandle(HttpContext context)
+		public override async Task ProcessAsync(string fullPath, HttpContext context)
 		{
-			string path = null;
-			string fullPath = null;
+			var content = await File.ReadAllTextAsync(fullPath);
 
-			if (!context.Request.Path.HasValue)
-			{
-				path = Path.Combine(ContentRootPath, "wwwroot", "index.cs");
-			}
-			else
-			{
-				var requestPath = context.Request.Path.Value.TrimStart('/');
+			context.Response.StatusCode = 200;
+			context.Response.ContentType = "text/html; charset=utf-8";
 
-				if (string.IsNullOrWhiteSpace(requestPath))
-				{
-					path = Path.Combine(ContentRootPath, "wwwroot", "index.cs");
-				}
-				else
-				{
-					if (Path.GetExtension(requestPath)?.ToLower() != ".cs")
-					{
-						return false;
-					}
-
-					path = Path.Combine(ContentRootPath, "wwwroot", requestPath
-						.Replace('/', Path.DirectorySeparatorChar)
-						.Replace('\\', Path.DirectorySeparatorChar));
-				}
-			}
-
-			if (File.Exists(path))
-			{
-				fullPath = path;
-			}
-			else
-			{
-				var paths = Directory.GetFiles(Path.Combine(ContentRootPath, "wwwroot"), "*", SearchOption.AllDirectories);
-				fullPath = paths.FirstOrDefault(p => p.EndsWith(path, StringComparison.OrdinalIgnoreCase));
-			}
-
-			if (fullPath != null && File.Exists(fullPath))
-			{
-				context.Response.StatusCode = 200;
-				context.Response.ContentType = "text/html; charset=utf-8";
-
-				var content = await File.ReadAllTextAsync(fullPath);
-
-				await CsProcessor.Instance.Run(content, new Globals(context));
-
-				return true;
-			}
-
-			return false;
+			await CsProcessor.Instance.Run(content, new Globals(context));
 		}
 	}
 }

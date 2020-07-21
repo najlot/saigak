@@ -1,13 +1,13 @@
 ﻿using Pchp.Core;
 using System.Collections.Concurrent;
 
-namespace Saigak.RequestHandler
+namespace Saigak.Processor
 {
 	public sealed class PhpProcessor
 	{
 		public static PhpProcessor Instance { get; } = new PhpProcessor();
 
-		private readonly ConcurrentDictionary<string, Context.IScript> cache = new ConcurrentDictionary<string, Context.IScript>();
+		private readonly ConcurrentDictionary<string, Context.IScript> _cache = new ConcurrentDictionary<string, Context.IScript>();
 
 		private readonly string[] AdditionalReferences = new[]
 		{
@@ -21,19 +21,16 @@ namespace Saigak.RequestHandler
 
 		public void Run(string content, Context context, string path, bool isSubmission = true)
 		{
-			if (!cache.TryGetValue(content, out var script))
-			{
-				var provider = Context.DefaultScriptingProvider;
+			var provider = Context.DefaultScriptingProvider;
 
-				script = provider.CreateScript(new Context.ScriptOptions()
-				{
-					Context = context,
-					IsSubmission = isSubmission,
-					EmitDebugInformation = false,
-					Location = new Location(path, 0, 0),
-					AdditionalReferences = AdditionalReferences,
-				}, content);
-			}
+			var script = provider.CreateScript(new Context.ScriptOptions()
+			{
+				Context = context,
+				IsSubmission = isSubmission,
+				EmitDebugInformation = false,
+				Location = new Location(path, 0, 0),
+				AdditionalReferences = AdditionalReferences,
+			}, content);
 
 			script.Evaluate(context, context.Globals);
 		}

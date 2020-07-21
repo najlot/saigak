@@ -5,15 +5,15 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Saigak.RequestHandler
+namespace Saigak.Processor
 {
 	public sealed class CsProcessor
 	{
 		public static CsProcessor Instance { get; } = new CsProcessor();
 
-		private readonly InteractiveAssemblyLoader loader;
-		private readonly ScriptOptions options;
-		private readonly ConcurrentDictionary<string, ScriptRunner<object>> cache = new ConcurrentDictionary<string, ScriptRunner<object>>();
+		private readonly InteractiveAssemblyLoader _loader;
+		private readonly ScriptOptions _options;
+		private readonly ConcurrentDictionary<string, ScriptRunner<object>> _cache = new ConcurrentDictionary<string, ScriptRunner<object>>();
 
 		public CsProcessor()
 		{
@@ -34,32 +34,26 @@ namespace Saigak.RequestHandler
 
 			var references = types.Select(type => type.Assembly).ToArray();
 
-			loader = new InteractiveAssemblyLoader();
+			_loader = new InteractiveAssemblyLoader();
 			foreach (var reference in references)
 			{
-				loader.RegisterDependency(reference);
+				_loader.RegisterDependency(reference);
 			}
 
-			options = ScriptOptions.Default
+			_options = ScriptOptions.Default
 				.WithReferences(references)
 				.AddImports(types.Select(type => type.Namespace).ToArray());
-
-			var dummy = CSharpScript
-				.Create("if (Context != null) await WriteAsync(\"Something is wrong.\");", options, typeof(Globals), loader)
-				.CreateDelegate();
-
-			dummy(new Globals(null));
 		}
 
 		public async Task Run(string content, Globals globals)
 		{
-			if (!cache.TryGetValue(content, out var script))
+			if (!_cache.TryGetValue(content, out var script))
 			{
 				script = CSharpScript
-				   .Create(content, options, typeof(Globals), loader)
+				   .Create(content, _options, typeof(Globals), _loader)
 				   .CreateDelegate();
 
-				cache[content] = script;
+				_cache[content] = script;
 			}
 
 			await script(globals);

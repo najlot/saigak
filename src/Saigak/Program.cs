@@ -21,13 +21,13 @@ namespace Saigak
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			var handler = new StaticRequestHandler(env.ContentRootPath)
-				.SetNext(new SaiRequestHandler(env.ContentRootPath))
+			var handler = new SaiRequestHandler(env.ContentRootPath)
 				.SetNext(new CsRequestHandler(env.ContentRootPath))
 				.SetNext(new PhpRequestHandler(env.ContentRootPath))
 				.SetNext(new PyRequestHandler(env.ContentRootPath))
 				.SetNext(new JsRequestHandler(env.ContentRootPath))
 				.SetNext(new LuaRequestHandler(env.ContentRootPath))
+				.SetNext(new StaticRequestHandler(env.ContentRootPath))
 				.SetNext(new NotFoundRequestHandler(env.ContentRootPath));
 
 			app.Run(async context =>
