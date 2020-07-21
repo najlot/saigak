@@ -1,4 +1,29 @@
-<!doctype html>
+<?cs
+if (!Context.Request.Cookies.TryGetValue("username", out var username))
+{
+	throw new Exception("no username");
+}
+
+if (!Context.Request.Cookies.TryGetValue("password", out var password))
+{
+	throw new Exception("no username");
+}
+
+class User
+{
+	public string Username { get; set; }
+	public string Password { get; set; }
+}
+
+var path = Path.Combine("data", "users.json");
+var content = await File.ReadAllTextAsync(path);
+var users = JsonConvert.DeserializeObject<List<User>>(content);
+
+if (!users.Any(u => u.Username == username && u.Password == password))
+{
+	throw new Exception("bad login");
+}
+?><!doctype html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
@@ -22,7 +47,12 @@
 		</thead>
 	<tbody>
 		<?cs
-		Directory.CreateDirectory("data");
+		if (!Context.Request.Cookies.TryGetValue("username", out var username))
+		{
+			username = "unknown";
+		}
+		
+		Directory.CreateDirectory(Path.Combine("data", username));
 		
 		public class TodoItem
 		{
@@ -32,7 +62,7 @@
 			public string Priority { get; set; }
 		}
 		
-		var path = Path.Combine("data", "todos.json");
+		var path = Path.Combine("data", username, "todos.json");
 		
 		if (!File.Exists(path))
 		{
