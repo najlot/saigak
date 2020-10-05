@@ -9,10 +9,14 @@ namespace Saigak.RequestHandler
 		{
 		}
 
-		public override async Task<bool> TryHandle(HttpContext context)
+		public override async Task<bool> TryHandle(Globals globals)
 		{
-			context.Response.StatusCode = 404;
-			await context.Response.WriteAsync($"File '{context.Request.Path}' not found!");
+			if (!globals.Context.Response.HasStarted)
+			{
+				globals.Context.Response.StatusCode = 404;
+			}
+
+			await globals.Context.Response.WriteAsync($"File '{globals.Context.Request.Path}' not found!");
 			return true;
 		}
 	}

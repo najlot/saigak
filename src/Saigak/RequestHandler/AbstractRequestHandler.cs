@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
 {
@@ -27,14 +26,14 @@ namespace Saigak.RequestHandler
 			return this;
 		}
 
-		public abstract Task<bool> TryHandle(HttpContext context);
+		public abstract Task<bool> TryHandle(Globals globals);
 
-		public async Task Handle(HttpContext context)
+		public async Task Handle(Globals globals)
 		{
-			var result = await TryHandle(context);
+			var result = await TryHandle(globals);
 			if (!result && _handler != null)
 			{
-				await _handler.Handle(context);
+				await _handler.Handle(globals);
 			}
 		}
 	}

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,19 +18,19 @@ namespace Saigak.RequestHandler
 			_indexPath = Path.Combine(ContentRootPath, "wwwroot", "index" + _extension);
 		}
 
-		public override async Task<bool> TryHandle(HttpContext context)
+		public override async Task<bool> TryHandle(Globals globals)
 		{
 			string path = null;
 			string fullPath = null;
 			bool fileExists = false;
 
-			if (!context.Request.Path.HasValue)
+			if (!globals.Context.Request.Path.HasValue)
 			{
 				path = _indexPath;
 			}
 			else
 			{
-				var requestPath = context.Request.Path.Value.TrimStart('/');
+				var requestPath = globals.Context.Request.Path.Value.TrimStart('/');
 
 				if (string.IsNullOrWhiteSpace(requestPath))
 				{
@@ -65,13 +64,13 @@ namespace Saigak.RequestHandler
 
 			if (fileExists)
 			{
-				await ProcessAsync(fullPath, context);
+				await ProcessAsync(fullPath, globals);
 				return true;
 			}
 
 			return false;
 		}
 
-		public abstract Task ProcessAsync(string fullPath, HttpContext context);
+		public abstract Task ProcessAsync(string fullPath, Globals globals);
 	}
 }

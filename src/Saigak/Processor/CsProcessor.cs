@@ -45,15 +45,15 @@ namespace Saigak.Processor
 				.AddImports(types.Select(type => type.Namespace).ToArray());
 		}
 
-		public async Task Run(string content, Globals globals)
+		public async Task Run(string key, string content, Globals globals)
 		{
-			if (!_cache.TryGetValue(content, out var script))
+			if (!_cache.TryGetValue(key, out var script))
 			{
 				script = CSharpScript
 				   .Create(content, _options, typeof(Globals), _loader)
 				   .CreateDelegate();
 
-				_cache[content] = script;
+				_cache[key] = script;
 			}
 
 			await script(globals);

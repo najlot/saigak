@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
 {
@@ -7,8 +6,8 @@ namespace Saigak.RequestHandler
 	{
 		IRequestHandler SetNext(IRequestHandler handler);
 
-		Task<bool> TryHandle(HttpContext context);
+		Task<bool> TryHandle(Globals globals);
 
-		Task Handle(HttpContext context);
+		Task Handle(Globals globals);
 	}
 }

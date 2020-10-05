@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,18 +12,18 @@ namespace Saigak.RequestHandler
 			Directory.CreateDirectory(Path.Combine(contentRootPath, "wwwroot", "static"));
 		}
 
-		public override async Task<bool> TryHandle(HttpContext context)
+		public override async Task<bool> TryHandle(Globals globals)
 		{
 			string path = null;
 			string fullPath = null;
 
-			if (!context.Request.Path.HasValue)
+			if (!globals.Context.Request.Path.HasValue)
 			{
 				path = Path.Combine(ContentRootPath, "wwwroot", "static", "index.html");
 			}
 			else
 			{
-				var requestPath = context.Request.Path.Value.TrimStart('/');
+				var requestPath = globals.Context.Request.Path.Value.TrimStart('/');
 
 				if (string.IsNullOrWhiteSpace(requestPath))
 				{
@@ -50,38 +49,42 @@ namespace Saigak.RequestHandler
 
 			if (fullPath != null && File.Exists(fullPath))
 			{
-				using var file = File.OpenRead(fullPath);
-				context.Response.StatusCode = 200;
+				var (key, content) = await FileContentCache.Instance.ReadAllBytesAsync(fullPath);
 
-				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
-				switch (Path.GetExtension(fullPath).ToLower())
+				if (!globals.Context.Response.HasStarted)
 				{
-					case ".css":
-						context.Response.ContentType = "text/css";
-						break;
+					globals.Context.Response.StatusCode = 200;
 
-					case ".html":
-						context.Response.ContentType = "text/html";
-						break;
+					// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+					switch (Path.GetExtension(fullPath).ToLower())
+					{
+						case ".css":
+							globals.Context.Response.ContentType = "text/css";
+							break;
 
-					case ".js":
-						context.Response.ContentType = "text/javascript";
-						break;
+						case ".html":
+							globals.Context.Response.ContentType = "text/html";
+							break;
 
-					case ".jpg":
-						context.Response.ContentType = "image/jpeg";
-						break;
+						case ".js":
+							globals.Context.Response.ContentType = "text/javascript";
+							break;
 
-					case ".png":
-						context.Response.ContentType = "image/png";
-						break;
+						case ".jpg":
+							globals.Context.Response.ContentType = "image/jpeg";
+							break;
 
-					case ".ico":
-						context.Response.ContentType = "image/x-icon";
-						break;
+						case ".png":
+							globals.Context.Response.ContentType = "image/png";
+							break;
+
+						case ".ico":
+							globals.Context.Response.ContentType = "image/x-icon";
+							break;
+					}
 				}
 
-				await file.CopyToAsync(context.Response.Body);
+				await globals.Context.Response.Body.WriteAsync(content);
 
 				return true;
 			}

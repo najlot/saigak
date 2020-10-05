@@ -12,7 +12,7 @@ namespace Saigak.Processor
 		private readonly ScriptEngine _engine = Python.CreateEngine();
 		private readonly ConcurrentDictionary<string, ScriptSource> _cache = new ConcurrentDictionary<string, ScriptSource>();
 
-		public void Run(string content, Globals globals)
+		public void Run(string key, string content, Globals globals)
 		{
 			var scope = _engine.CreateScope();
 
@@ -28,10 +28,10 @@ namespace Saigak.Processor
 				globals.WriteLine(str);
 			}));
 
-			if (!_cache.TryGetValue(content, out var source))
+			if (!_cache.TryGetValue(key, out var source))
 			{
 				source = _engine.CreateScriptSourceFromString(content);
-				_cache[content] = source;
+				_cache[key] = source;
 			}
 
 			source.Execute(scope);

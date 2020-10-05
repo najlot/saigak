@@ -7,7 +7,7 @@ namespace Saigak.Processor
 	{
 		public static PhpProcessor Instance { get; } = new PhpProcessor();
 
-		private readonly ConcurrentDictionary<string, Context.IScript> _cache = new ConcurrentDictionary<string, Context.IScript>();
+		// private readonly ConcurrentDictionary<string, Context.IScript> _cache = new ConcurrentDictionary<string, Context.IScript>();
 
 		private readonly string[] AdditionalReferences = new[]
 		{

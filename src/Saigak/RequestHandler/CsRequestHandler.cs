@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Saigak.Processor;
-using System.IO;
+﻿using Saigak.Processor;
 using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
@@ -11,14 +9,10 @@ namespace Saigak.RequestHandler
 		{
 		}
 
-		public override async Task ProcessAsync(string fullPath, HttpContext context)
+		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
-			var content = await File.ReadAllTextAsync(fullPath);
-
-			context.Response.StatusCode = 200;
-			context.Response.ContentType = "text/html; charset=utf-8";
-
-			await CsProcessor.Instance.Run(content, new Globals(context));
+			var (key, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
+			await CsProcessor.Instance.Run(key, content, globals);
 		}
 	}
 }

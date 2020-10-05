@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Peachpie.AspNetCore.Web;
-using Saigak.Processor;
+﻿using Saigak.Processor;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Saigak.RequestHandler
@@ -14,15 +14,17 @@ namespace Saigak.RequestHandler
 			Directory.CreateDirectory(Path.Combine(contentRootPath, "wwwroot"));
 		}
 
-		public override async Task ProcessAsync(string fullPath, HttpContext context)
+		private readonly ConcurrentDictionary<string, (string Language, string Content)[]> _sectionsCache = new ConcurrentDictionary<string, (string Language, string Content)[]>();
+
+		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
-			context.Response.ContentType = "text/html; charset=utf-8";
+			var (key, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
 
-			var content = await File.ReadAllTextAsync(fullPath);
-			var globals = new Globals(context);
-			var sections = GetSections(content);
-
-			var ctx = context.GetOrCreateContext();
+			if (!_sectionsCache.TryGetValue(key, out var sections))
+			{
+				sections = GetSections(content).ToArray();
+				_sectionsCache[key] = sections;
+			}
 
 			foreach (var (Language, Content) in sections)
 			{
@@ -34,19 +36,19 @@ namespace Saigak.RequestHandler
 				switch (Language.ToLower())
 				{
 					case "cs":
-						await CsProcessor.Instance.Run(Content, globals);
+						await CsProcessor.Instance.Run(Content, Content, globals);
 						break;
 
 					case "py":
-						PyProcessor.Instance.Run(Content, globals);
+						PyProcessor.Instance.Run(Content, Content, globals);
 						break;
 
 					case "php":
-						PhpProcessor.Instance.Run(Content, ctx, fullPath);
+						PhpProcessor.Instance.Run(Content, globals.PhpContext, fullPath);
 						break;
 
 					case "js":
-						JsProcessor.Instance.Run(Content, globals);
+						JsProcessor.Instance.Run(Content, Content, globals);
 						break;
 
 					case "lua":
@@ -101,7 +103,7 @@ namespace Saigak.RequestHandler
 							continue;
 						}
 
-						if (c == ' ' || c == '\n')
+						if (c == ' ' || c == '\r' || c == '\n')
 						{
 							index++;
 							break;

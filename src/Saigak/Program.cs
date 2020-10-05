@@ -32,7 +32,8 @@ namespace Saigak
 
 			app.Run(async context =>
 			{
-				await handler.Handle(context);
+				var globals = new Globals(context, handler);
+				await handler.Handle(globals);
 			});
 		}
 	}

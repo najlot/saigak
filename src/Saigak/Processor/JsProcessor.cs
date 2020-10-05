@@ -10,7 +10,7 @@ namespace Saigak.Processor
 
 		private readonly ConcurrentDictionary<string, CompiledScript> _cache = new ConcurrentDictionary<string, CompiledScript>();
 
-		public void Run(string content, Globals globals, string path = null)
+		public void Run(string key, string content, Globals globals, string path = null)
 		{
 			var engine = new ScriptEngine()
 			{
@@ -29,10 +29,10 @@ namespace Saigak.Processor
 				globals.Write(str);
 			}));
 
-			if (!_cache.TryGetValue(content, out var script))
+			if (!_cache.TryGetValue(key, out var script))
 			{
 				script = engine.Compile(new StringScriptSource(content, path));
-				_cache[content] = script;
+				_cache[key] = script;
 			}
 
 			script.Execute(engine);
