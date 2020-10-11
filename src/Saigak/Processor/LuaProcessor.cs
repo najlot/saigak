@@ -11,15 +11,10 @@ namespace Saigak.Processor
 		{
 			var script = new Script();
 
-			script.Globals["write"] = (Action<string>)(str =>
-			{
-				globals.Write(str);
-			});
-
-			script.Globals["writeline"] = (Action<string>)(str =>
-			{
-				globals.Write(str);
-			});
+			script.Globals["write"] = (Action<string>)(str => globals.Write(str));
+			script.Globals["writeline"] = (Action<string>)(str => globals.Write(str));
+			script.Globals["getrequeststring"] = (Func<string>)(() => globals.GetRequestString());
+			script.Globals["getrequestbytes"] = (Func<byte[]>)(() => globals.GetRequestBytes());
 
 			script.DoString(content);
 		}

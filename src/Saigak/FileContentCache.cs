@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -8,12 +9,13 @@ namespace Saigak
 	{
 		public static FileContentCache Instance { get; } = new FileContentCache();
 
-		private readonly ConcurrentDictionary<string, byte[]> _byteCache = new ConcurrentDictionary<string, byte[]>();
-		private readonly ConcurrentDictionary<string, string> _stringCache = new ConcurrentDictionary<string, string>();
+		private readonly ConcurrentDictionary<(string, DateTime), byte[]> _byteCache = new ConcurrentDictionary<(string, DateTime), byte[]>();
+		private readonly ConcurrentDictionary<(string, DateTime), string> _stringCache = new ConcurrentDictionary<(string, DateTime), string>();
 
 		public async Task<(string Key, string Content)> ReadAllTextAsync(string path)
 		{
-			var key = path + File.GetLastWriteTime(path);
+			var time = File.GetLastWriteTime(path);
+			var key = (path, time);
 
 			if (!_stringCache.TryGetValue(key, out var val))
 			{
@@ -21,12 +23,13 @@ namespace Saigak
 				_stringCache[key] = val;
 			}
 
-			return (key, val);
+			return (path + time, val);
 		}
 
-		public async Task<(string Key, byte[] Content)> ReadAllBytesAsync(string path)
+		public async Task<byte[]> ReadAllBytesAsync(string path)
 		{
-			var key = path + File.GetLastWriteTime(path);
+			var time = File.GetLastWriteTime(path);
+			var key = (path, time);
 
 			if (!_byteCache.TryGetValue(key, out var val))
 			{
@@ -34,7 +37,7 @@ namespace Saigak
 				_byteCache[key] = val;
 			}
 
-			return (key, val);
+			return val;
 		}
 	}
 }

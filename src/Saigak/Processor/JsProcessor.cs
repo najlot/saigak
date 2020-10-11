@@ -19,15 +19,10 @@ namespace Saigak.Processor
 
 			engine.SetGlobalValue("context", globals.Context);
 
-			engine.SetGlobalFunction("write", (Action<string>)(str =>
-			{
-				globals.Write(str);
-			}));
-
-			engine.SetGlobalFunction("writeline", (Action<string>)(str =>
-			{
-				globals.Write(str);
-			}));
+			engine.SetGlobalFunction("write", (Action<string>)(str => globals.Write(str)));
+			engine.SetGlobalFunction("writeline", (Action<string>)(str => globals.Write(str)));
+			engine.SetGlobalFunction("getrequeststring", (Func<string>)(() => globals.GetRequestString()));
+			engine.SetGlobalFunction("getrequestbytes", (Func<byte[]>)(() => globals.GetRequestBytes()));
 
 			if (!_cache.TryGetValue(key, out var script))
 			{

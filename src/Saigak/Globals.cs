@@ -2,6 +2,7 @@
 using Peachpie.AspNetCore.Web;
 using Saigak.RequestHandler;
 using System.Buffers;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,6 +71,23 @@ namespace Saigak
 			var bytes = _encoding.GetBytes(s);
 			Context.Response.BodyWriter.Write(bytes);
 			Context.Response.BodyWriter.Write(_newLineBytes);
+		}
+
+		public string GetRequestString()
+		{
+			using (var streamReader = new StreamReader(Context.Request.Body, Encoding.UTF8))
+			{
+				return streamReader.ReadToEnd();
+			}
+		}
+
+		public byte[] GetRequestBytes()
+		{
+			using (var ms = new MemoryStream())
+			{
+				Context.Request.Body.CopyTo(ms);
+				return ms.ToArray();
+			}
 		}
 
 		public async Task RunFileAsync(string path)

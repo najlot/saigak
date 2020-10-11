@@ -49,7 +49,7 @@ namespace Saigak.RequestHandler
 
 			if (fullPath != null && File.Exists(fullPath))
 			{
-				var (key, content) = await FileContentCache.Instance.ReadAllBytesAsync(fullPath);
+				var content = await FileContentCache.Instance.ReadAllBytesAsync(fullPath);
 
 				if (!globals.Context.Response.HasStarted)
 				{
