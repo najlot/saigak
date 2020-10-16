@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Saigak
@@ -20,6 +21,13 @@ namespace Saigak
 			if (!_stringCache.TryGetValue(key, out var val))
 			{
 				val = await File.ReadAllTextAsync(path);
+
+				var duplicates = _stringCache.Keys.Where(k => k.Item1 == path).ToArray();
+				foreach (var duplicate in duplicates)
+				{
+					_stringCache.TryRemove(duplicate, out _);
+				}
+
 				_stringCache[key] = val;
 			}
 
@@ -34,6 +42,13 @@ namespace Saigak
 			if (!_byteCache.TryGetValue(key, out var val))
 			{
 				val = await File.ReadAllBytesAsync(path);
+
+				var duplicates = _byteCache.Keys.Where(k => k.Item1 == path).ToArray();
+				foreach (var duplicate in duplicates)
+				{
+					_byteCache.TryRemove(duplicate, out _);
+				}
+
 				_byteCache[key] = val;
 			}
 
