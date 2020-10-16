@@ -11,8 +11,8 @@ namespace Saigak.RequestHandler
 
 		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
-			var (key, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
-			PyProcessor.Instance.Run(key, content, globals);
+			var (path, time, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
+			PyProcessor.Instance.Run((path, time), content, globals);
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace Saigak.RequestHandler
 
 		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
-			var (key, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
+			var (path, time, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
 
 			LuaProcessor.Instance.Run(content, globals);
 		}

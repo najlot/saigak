@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.Scripting.Hosting;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Saigak.Processor
 
 		private readonly InteractiveAssemblyLoader _loader;
 		private readonly ScriptOptions _options;
-		private readonly ConcurrentDictionary<string, ScriptRunner<object>> _cache = new ConcurrentDictionary<string, ScriptRunner<object>>();
+		private readonly ConcurrentDictionary<(string Path, DateTime Time), ScriptRunner<object>> _cache = new ConcurrentDictionary<(string Path, DateTime Time), ScriptRunner<object>>();
 
 		public CsProcessor()
 		{
@@ -26,7 +27,7 @@ namespace Saigak.Processor
 				typeof(System.Dynamic.DynamicObject),
 				typeof(System.Collections.Generic.List<>),
 				typeof(System.Text.RegularExpressions.Regex),
-				typeof(ConcurrentDictionary<,>),
+				typeof(System.Collections.Concurrent.ConcurrentDictionary<,>),
 				typeof(Newtonsoft.Json.JsonConvert),
 
 				typeof(Microsoft.AspNetCore.Http.HttpResponseWritingExtensions)
@@ -45,13 +46,19 @@ namespace Saigak.Processor
 				.AddImports(types.Select(type => type.Namespace).ToArray());
 		}
 
-		public async Task Run(string key, string content, Globals globals)
+		public async Task Run((string Path, DateTime Time) key, string content, Globals globals)
 		{
 			if (!_cache.TryGetValue(key, out var script))
 			{
 				script = CSharpScript
 				   .Create(content, _options, typeof(Globals), _loader)
 				   .CreateDelegate();
+
+				var duplicates = _cache.Keys.Where(k => k.Path == key.Path).ToArray();
+				foreach (var duplicate in duplicates)
+				{
+					_cache.TryRemove(duplicate, out _);
+				}
 
 				_cache[key] = script;
 			}

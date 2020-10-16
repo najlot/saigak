@@ -13,10 +13,10 @@ namespace Saigak
 		private readonly ConcurrentDictionary<(string, DateTime), byte[]> _byteCache = new ConcurrentDictionary<(string, DateTime), byte[]>();
 		private readonly ConcurrentDictionary<(string, DateTime), string> _stringCache = new ConcurrentDictionary<(string, DateTime), string>();
 
-		public async Task<(string Key, string Content)> ReadAllTextAsync(string path)
+		public async Task<(string Path, DateTime Time, string Content)> ReadAllTextAsync(string path)
 		{
 			var time = File.GetLastWriteTime(path);
-			var key = (path, time);
+			var key = (Path: path, Time: time);
 
 			if (!_stringCache.TryGetValue(key, out var val))
 			{
@@ -31,7 +31,7 @@ namespace Saigak
 				_stringCache[key] = val;
 			}
 
-			return (path + time, val);
+			return (path, time, val);
 		}
 
 		public async Task<byte[]> ReadAllBytesAsync(string path)

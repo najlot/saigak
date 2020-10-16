@@ -1,6 +1,7 @@
 ﻿using Jurassic;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Saigak.Processor
 {
@@ -8,9 +9,9 @@ namespace Saigak.Processor
 	{
 		public static JsProcessor Instance { get; } = new JsProcessor();
 
-		private readonly ConcurrentDictionary<string, CompiledScript> _cache = new ConcurrentDictionary<string, CompiledScript>();
+		private readonly ConcurrentDictionary<(string Path, DateTime Time), CompiledScript> _cache = new ConcurrentDictionary<(string Path, DateTime Time), CompiledScript>();
 
-		public void Run(string key, string content, Globals globals, string path = null)
+		public void Run((string Path, DateTime Time) key, string content, Globals globals, string path = null)
 		{
 			var engine = new ScriptEngine()
 			{
@@ -27,6 +28,13 @@ namespace Saigak.Processor
 			if (!_cache.TryGetValue(key, out var script))
 			{
 				script = engine.Compile(new StringScriptSource(content, path));
+				
+				var duplicates = _cache.Keys.Where(k => k.Path == key.Path).ToArray();
+				foreach (var duplicate in duplicates)
+				{
+					_cache.TryRemove(duplicate, out _);
+				}
+
 				_cache[key] = script;
 			}
 

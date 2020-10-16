@@ -1,4 +1,5 @@
 ﻿using Saigak.Processor;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -14,20 +15,31 @@ namespace Saigak.RequestHandler
 			Directory.CreateDirectory(Path.Combine(contentRootPath, "wwwroot"));
 		}
 
-		private readonly ConcurrentDictionary<string, (string Language, string Content)[]> _sectionsCache = new ConcurrentDictionary<string, (string Language, string Content)[]>();
+		private readonly ConcurrentDictionary<(string Path, DateTime Time), (string Language, string Content)[]> _sectionsCache = new ConcurrentDictionary<(string Path, DateTime Time), (string Language, string Content)[]>();
 
 		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
-			var (key, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
+			var (path, time, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
+			var sectionsKey = (path, time);
 
-			if (!_sectionsCache.TryGetValue(key, out var sections))
+			if (!_sectionsCache.TryGetValue(sectionsKey, out var sections))
 			{
 				sections = GetSections(content).ToArray();
-				_sectionsCache[key] = sections;
+
+				var duplicates = _sectionsCache.Keys.Where(k => k.Path == path).ToArray();
+				foreach (var duplicate in duplicates)
+				{
+					_sectionsCache.TryRemove(duplicate, out _);
+				}
+
+				_sectionsCache[sectionsKey] = sections;
 			}
 
+			int i = 0;
 			foreach (var (Language, Content) in sections)
 			{
+				var scriptKey = ($"{sectionsKey.path}´{i++}", sectionsKey.time);
+
 				if (Content.Length < 1)
 				{
 					continue;
@@ -36,11 +48,11 @@ namespace Saigak.RequestHandler
 				switch (Language.ToLower())
 				{
 					case "cs":
-						await CsProcessor.Instance.Run(Content, Content, globals);
+						await CsProcessor.Instance.Run(scriptKey, Content, globals);
 						break;
 
 					case "py":
-						PyProcessor.Instance.Run(Content, Content, globals);
+						PyProcessor.Instance.Run(scriptKey, Content, globals);
 						break;
 
 					case "php":
@@ -48,7 +60,7 @@ namespace Saigak.RequestHandler
 						break;
 
 					case "js":
-						JsProcessor.Instance.Run(Content, Content, globals);
+						JsProcessor.Instance.Run(scriptKey, Content, globals);
 						break;
 
 					case "lua":

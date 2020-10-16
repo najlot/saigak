@@ -11,8 +11,8 @@ namespace Saigak.RequestHandler
 
 		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
-			var (key, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
-			JsProcessor.Instance.Run(key, content, globals, fullPath);
+			var (path, time, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
+			JsProcessor.Instance.Run((path, time), content, globals, fullPath);
 		}
 	}
 }
