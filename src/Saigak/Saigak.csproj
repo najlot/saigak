@@ -17,7 +17,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.6.0" />
     <PackageReference Include="MoonSharp" Version="2.0.0" />
     <PackageReference Include="Najlot.Log.Extensions.Logging" Version="4.0.0-alpha-6" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Peachpie.AspNetCore.Web" Version="0.9.990" />
     <PackageReference Include="Peachpie.Library.Scripting" Version="0.9.990" />
   </ItemGroup>
