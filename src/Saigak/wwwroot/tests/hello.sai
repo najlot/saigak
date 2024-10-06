@@ -1,0 +1,9 @@
+<?cs
+Write("Hello from");
+await WriteAsync(" C#!<br>");
+?>
+<?js write("Hello from JS!<br>");?>
+<?lua write("Hello from lua!<br>");?>
+<?php echo("Hello from PHP!<br>");?>
+<?py write("Hello from Python!<br>");?>
+Hello from SAI!<br>

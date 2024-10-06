@@ -351,3 +351,8 @@ MigrationBackup/
 
 # Python library
 src/Saigak/py_lib
+
+# Data folder
+/src/Saigak/data
+/src/Saigak.Data/data
+/src/Saigak.Blobs/data

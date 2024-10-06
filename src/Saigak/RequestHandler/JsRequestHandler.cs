@@ -12,7 +12,7 @@ namespace Saigak.RequestHandler
 		public override async Task ProcessAsync(string fullPath, Globals globals)
 		{
 			var (path, time, content) = await FileContentCache.Instance.ReadAllTextAsync(fullPath);
-			JsProcessor.Instance.Run((path, time), content, globals, fullPath);
+			await JsProcessor.Instance.Run((path, time), content, globals, fullPath);
 		}
 	}
 }

@@ -12,47 +12,66 @@ namespace Saigak.Processor
 	{
 		public static CsProcessor Instance { get; } = new CsProcessor();
 
-		private readonly InteractiveAssemblyLoader _loader;
-		private readonly ScriptOptions _options;
-		private readonly ConcurrentDictionary<(string Path, DateTime Time), ScriptRunner<object>> _cache = new ConcurrentDictionary<(string Path, DateTime Time), ScriptRunner<object>>();
+		private readonly InteractiveAssemblyLoader _loader = GetLoader();
+		private readonly ScriptOptions _options = GetOptions();
+		private readonly ConcurrentDictionary<(string Path, DateTime Time), ScriptRunner<object>> _cache = new();
+		private readonly Script<object> _initialScript = null;
+
+		private static System.Reflection.Assembly[] GetReferences() => new[]
+		{
+			typeof(object).Assembly,
+			typeof(System.IO.FileInfo).Assembly,
+			typeof(System.Linq.IQueryable).Assembly,
+			typeof(Newtonsoft.Json.JsonConvert).Assembly,
+			typeof(System.Dynamic.DynamicObject).Assembly,
+			// typeof(System.Threading.Tasks.Task).Assembly,
+			// typeof(System.Collections.Generic.List<>).Assembly,
+			typeof(System.Text.RegularExpressions.Regex).Assembly,
+			// typeof(System.Collections.Concurrent.ConcurrentDictionary<,>).Assembly,
+			typeof(Microsoft.AspNetCore.Http.HttpResponseWritingExtensions).Assembly
+		};
+
+		private static InteractiveAssemblyLoader GetLoader()
+		{
+			var loader = new InteractiveAssemblyLoader();
+
+			foreach (var reference in GetReferences())
+			{
+				loader.RegisterDependency(reference);
+			}
+
+			return loader;
+		}
+
+		private static ScriptOptions GetOptions()
+		{
+			return ScriptOptions.Default
+					.WithReferences(GetReferences())
+					.AddImports(
+						"System",
+						"System.IO",
+						"System.Linq",
+						"System.Text",
+						"System.Dynamic",
+						"Newtonsoft.Json",
+						"System.Collections.Generic",
+						"System.Text.RegularExpressions"
+						);
+		}
 
 		public CsProcessor()
 		{
-			var types = new[]
-			{
-				typeof(object),
-				typeof(System.IO.FileInfo),
-				typeof(System.Linq.IQueryable),
-				typeof(System.Threading.Tasks.Task),
-				typeof(System.Dynamic.DynamicObject),
-				typeof(System.Collections.Generic.List<>),
-				typeof(System.Text.RegularExpressions.Regex),
-				typeof(System.Collections.Concurrent.ConcurrentDictionary<,>),
-				typeof(Newtonsoft.Json.JsonConvert),
-
-				typeof(Microsoft.AspNetCore.Http.HttpResponseWritingExtensions)
-			};
-
-			var references = types.Select(type => type.Assembly).ToArray();
-
-			_loader = new InteractiveAssemblyLoader();
-			foreach (var reference in references)
-			{
-				_loader.RegisterDependency(reference);
-			}
-
-			_options = ScriptOptions.Default
-				.WithReferences(references)
-				.AddImports(types.Select(type => type.Namespace).ToArray());
+			_initialScript = CSharpScript.Create("", _options, typeof(Globals), _loader);
+			_initialScript.Compile();
 		}
 
 		public async Task Run((string Path, DateTime Time) key, string content, Globals globals)
 		{
 			if (!_cache.TryGetValue(key, out var script))
 			{
-				script = CSharpScript
-				   .Create(content, _options, typeof(Globals), _loader)
-				   .CreateDelegate();
+				script = _initialScript
+					.ContinueWith(content, _options)
+					.CreateDelegate();
 
 				var duplicates = _cache.Keys.Where(k => k.Path == key.Path).ToArray();
 				foreach (var duplicate in duplicates)

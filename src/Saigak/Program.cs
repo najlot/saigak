@@ -8,6 +8,8 @@ using Najlot.Log;
 using Najlot.Log.Destinations;
 using Najlot.Log.Extensions.Logging;
 using Najlot.Log.Middleware;
+using System.IO;
+using Saigak.Processor;
 
 namespace Saigak
 {
@@ -16,11 +18,7 @@ namespace Saigak
 		public static async Task Main(string[] args)
 		{
 			LogAdministrator.Instance
-#if DEBUG
-				.SetLogLevel(Najlot.Log.LogLevel.Debug)
-#else
-				.SetLogLevel(Najlot.Log.LogLevel.Warn)
-#endif
+				.SetLogLevel(Najlot.Log.LogLevel.Info)
 				.SetCollectMiddleware<ConcurrentCollectMiddleware, ConsoleDestination>()
 				.AddConsoleDestination(true);
 
@@ -57,7 +55,18 @@ namespace Saigak
 			app.Run(async context =>
 			{
 				var globals = new Globals(context, handler);
+
+				var routerPath = Path.Combine(contentRootPath, "wwwroot", "router.cs");
+				if (File.Exists(routerPath))
+				{
+					var content = await FileContentCache.Instance.ReadAllTextAsync(routerPath);
+					await CsProcessor.Instance.Run((content.Path, content.Time), content.Content, globals);
+				}
+
 				await handler.Handle(globals);
+
+				await globals.FlushAsync();
+				globals.Dispose();
 			});
 		}
 	}

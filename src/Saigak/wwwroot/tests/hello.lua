@@ -1,0 +1,2 @@
+
+Writeline("Hello from lua!");

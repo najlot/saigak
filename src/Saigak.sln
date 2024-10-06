@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30204.135
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saigak", "Saigak\Saigak.csproj", "{F1CCBF89-5D81-4599-9CF1-12BC6B09B314}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saigak", "Saigak\Saigak.csproj", "{F1CCBF89-5D81-4599-9CF1-12BC6B09B314}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saigak.Data", "Saigak.Data\Saigak.Data.csproj", "{F2F88A5D-CACC-42D1-B22F-64CC84F5BCF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saigak.Blobs", "Saigak.Blobs\Saigak.Blobs.csproj", "{FF918179-20C7-4014-B41D-EFB5F74C24CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{F1CCBF89-5D81-4599-9CF1-12BC6B09B314}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1CCBF89-5D81-4599-9CF1-12BC6B09B314}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1CCBF89-5D81-4599-9CF1-12BC6B09B314}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2F88A5D-CACC-42D1-B22F-64CC84F5BCF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2F88A5D-CACC-42D1-B22F-64CC84F5BCF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2F88A5D-CACC-42D1-B22F-64CC84F5BCF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2F88A5D-CACC-42D1-B22F-64CC84F5BCF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF918179-20C7-4014-B41D-EFB5F74C24CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF918179-20C7-4014-B41D-EFB5F74C24CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF918179-20C7-4014-B41D-EFB5F74C24CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF918179-20C7-4014-B41D-EFB5F74C24CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

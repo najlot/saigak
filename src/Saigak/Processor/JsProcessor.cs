@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Saigak.Processor
 {
@@ -9,9 +10,9 @@ namespace Saigak.Processor
 	{
 		public static JsProcessor Instance { get; } = new JsProcessor();
 
-		private readonly ConcurrentDictionary<(string Path, DateTime Time), CompiledScript> _cache = new ConcurrentDictionary<(string Path, DateTime Time), CompiledScript>();
+		private readonly ConcurrentDictionary<(string Path, DateTime Time), CompiledScript> _cache = new();
 
-		public void Run((string Path, DateTime Time) key, string content, Globals globals, string path = null)
+		public async Task Run((string Path, DateTime Time) key, string content, Globals globals, string path = null)
 		{
 			var engine = new ScriptEngine()
 			{
@@ -21,13 +22,13 @@ namespace Saigak.Processor
 			engine.SetGlobalValue("context", globals.Context);
 
 			engine.SetGlobalFunction("write", (Action<string>)(str => globals.Write(str)));
-			engine.SetGlobalFunction("writeline", (Action<string>)(str => globals.Write(str)));
+			engine.SetGlobalFunction("writeline", (Action<string>)(str => globals.WriteLine(str)));
 			engine.SetGlobalFunction("getrequeststring", (Func<string>)(() => globals.GetRequestString()));
 			engine.SetGlobalFunction("getrequestbytes", (Func<byte[]>)(() => globals.GetRequestBytes()));
 
 			if (!_cache.TryGetValue(key, out var script))
 			{
-				script = engine.Compile(new StringScriptSource(content, path));
+				script = CompiledScript.Compile(new StringScriptSource(content, path));
 				
 				var duplicates = _cache.Keys.Where(k => k.Path == key.Path).ToArray();
 				foreach (var duplicate in duplicates)
@@ -39,6 +40,8 @@ namespace Saigak.Processor
 			}
 
 			script.Execute(engine);
+
+			await globals.Context.Response.BodyWriter.FlushAsync();
 		}
 	}
 }

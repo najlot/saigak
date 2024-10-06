@@ -56,11 +56,12 @@ namespace Saigak.RequestHandler
 						break;
 
 					case "php":
+						await globals.FlushAsync();
 						PhpProcessor.Instance.Run(Content, globals.PhpContext, fullPath);
 						break;
 
 					case "js":
-						JsProcessor.Instance.Run(scriptKey, Content, globals);
+						await JsProcessor.Instance.Run(scriptKey, Content, globals);
 						break;
 
 					case "lua":

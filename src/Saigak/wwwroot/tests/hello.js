@@ -1,0 +1,2 @@
+
+writeline("Hello from JS!");
